@@ -2,8 +2,6 @@
 
 abstract class LibraryObject(val name: String, var available: Boolean, val id: Int) {
     abstract fun getInfoGlobal(): String
-    abstract fun canBeTakenHome(): Boolean
-    abstract fun canBeReadHere(): Boolean
     abstract fun getType(): String
 
 
@@ -16,4 +14,12 @@ abstract class LibraryObject(val name: String, var available: Boolean, val id: I
     fun markAsReturned() {
         available = true
     }
+}
+
+interface HomeTakeable {
+    fun takeHome()
+}
+
+interface LibraryReadable {
+    fun readHere()
 }

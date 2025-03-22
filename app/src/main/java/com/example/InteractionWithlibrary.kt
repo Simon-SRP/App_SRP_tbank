@@ -4,7 +4,7 @@ class InteractionWithLibrary {
     fun takeHome(obj: LibraryObject) {
         runCatching {
             require(obj.available) { "Объект ${obj.id} недоступен!" }
-            require(obj.canBeTakenHome()) { "Этот тип объекта нельзя брать домой!" }
+            require(obj is HomeTakeable) { "Этот тип объекта нельзя брать домой!" }
             obj.markAsTaken()
             println("${obj.getType()} ${obj.id} взят домой")
         }.onFailure { println(it.message) }
@@ -21,7 +21,7 @@ class InteractionWithLibrary {
     fun readInLibrary(obj: LibraryObject) {
         runCatching {
             require(obj.available) { "Объект ${obj.id} недоступен!" }
-            require(obj.canBeReadHere()) { "Этот тип объекта нельзя читать в зале!" }
+            require(obj is LibraryReadable) { "Этот тип объекта нельзя читать в зале!" }
             obj.markAsTaken()
             println("${obj.getType()} ${obj.id} взят для чтения в зале")
         }.onFailure { println(it.message) }
