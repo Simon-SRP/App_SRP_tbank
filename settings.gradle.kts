@@ -21,3 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "App_SRP"
 include(":app")
+include(":app")
+include(":app")
+ 
