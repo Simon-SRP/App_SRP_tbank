@@ -17,3 +17,25 @@ class Book(name: String, available: Boolean, id: Int, val pages: Int, val create
         println("Книга $id читается в библиотеке")
     }
 }
+
+class BookShop : Shop<Book> {
+    val booksShop = listOf(
+        Book("1984", true, 12441, 328, "Джордж Оруэлл"),
+        Book("Мастер и Маргарита", true, 12943, 480, "Михаил Булгаков"),
+        Book("Преступление и наказание", true, 12360, 672, "Федор Достоевский")
+    )
+    private var currentIndex = 0
+
+    override fun sell(): Book {
+        val book = booksShop[currentIndex]
+        currentIndex = (currentIndex + 1) % booksShop.size
+        return book
+    }
+
+    override fun showAllProducts() {
+        println("Доступные книги:")
+        booksShop.forEachIndexed { index, book ->
+            println("${index + 1}. ${book.getInfoMini()}")
+        }
+    }
+}

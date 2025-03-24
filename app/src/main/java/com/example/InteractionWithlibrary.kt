@@ -1,6 +1,6 @@
 ﻿package com.example
 
-class InteractionWithLibrary {
+class InteractionWithLibrary(private val archive: LibraryArhiv) {
     fun takeHome(obj: LibraryObject) {
         runCatching {
             require(obj.available) { "Объект ${obj.id} недоступен!" }
@@ -32,8 +32,8 @@ class InteractionWithLibrary {
             println("${index + 1}. ${obj.getInfoMini()}")
         }
         print("Выберите объект: ")
-        val choise = objects.getOrNull(readLine()?.toIntOrNull()?.minus(1) ?: -1)
-        if (choise==null) {
+        val choice = objects.getOrNull(readLine()?.toIntOrNull()?.minus(1) ?: -1)
+        if (choice == null) {
             println("Попробуйте заново")
             return
         }
@@ -43,15 +43,65 @@ class InteractionWithLibrary {
             println("2. Читать в читальном зале")
             println("3. Показать более подробную информацию.")
             println("4. Вернуть")
-            println("5. Назад к выбору типа объекта")
+            println("5. Оцифровать")
+            println("6. Назад к выбору типа объекта")
             when (readlnOrNull()?.toIntOrNull()) {
-                1 -> takeHome(choise)
-                2 -> readInLibrary(choise)
-                3 -> println(choise.getInfoGlobal())
-                4 -> returnObject(choise)
-                5 -> return
+                1 -> takeHome(choice)
+                2 -> readInLibrary(choice)
+                3 -> println(choice.getInfoGlobal())
+                4 -> returnObject(choice)
+                5 -> {
+                    val digitization = DigitizationInCD()
+                    when (choice) {
+                        is Book -> {
+                            val disk = digitization.bookToCD(choice, archive)
+                            println("Книга оцифрована в диск: ${disk.name}")
+                        }
+                        is Newspaper -> {
+                            val disk = digitization.newspaperToCD(choice, archive)
+                            println("Газета оцифрована в диск: ${disk.name}")
+                        }
+                        else -> println("Этот объект нельзя оцифровать.")
+                    }
+                }
+                6 -> return
                 else -> println("Неверный ввод!")
             }
         }
     }
+}
+
+class ManagerShop(private val archive: LibraryArhiv) {
+    fun <T : LibraryObject> buy(shop: Shop<T>): T {
+        shop.showAllProducts()
+
+        print("Выберите объект: ")
+        val choice = readlnOrNull()?.toIntOrNull()?.minus(1) ?: -1
+
+        val item = when (shop) {
+            is BookShop -> shop.booksShop.getOrNull(choice)
+            is DiskShop -> shop.disksShop.getOrNull(choice)
+            is NewspaperShop -> shop.newspapersShop.getOrNull(choice)
+            else -> null
+        } as? T
+
+        if (item == null) {
+            println("Неверный выбор.")
+            throw IllegalArgumentException("Неверный выбор объекта.")
+        }
+
+        when (item) {
+            is Book -> archive.books.add(item)
+            is Disk -> archive.disks.add(item)
+            is Newspaper -> archive.newspapers.add(item)
+        }
+        println("Куплен объект: ${item.getInfoMini()}")
+        return item
+    }
+}
+
+
+
+inline fun <reified T> filterTypes(obj: List<LibraryObject>): List<T>{
+    return obj.filterIsInstance<T>()
 }
